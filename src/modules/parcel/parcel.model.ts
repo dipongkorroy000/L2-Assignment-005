@@ -2,27 +2,11 @@ import { Schema, model } from "mongoose";
 import { IParcel, Status, Payment_Status } from "./parcel.interface";
 
 const statusLogSchema = new Schema({
-  status: {
-    type: String,
-    enum: Object.values(Status),
-    required: true,
-  },
-  updatedBy: {
-    type: String,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  note: {
-    type: String,
-    default: "",
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
+  status: { type: String, enum: Object.values(Status), required: true },
+  updatedBy: { type: String, required: true },
+  location: { type: String, required: true },
+  note: { type: String, default: "" },
+  timestamp: { type: Date, default: Date.now },
 });
 
 const parcelSchema = new Schema<IParcel>(
