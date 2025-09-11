@@ -1,0 +1,23 @@
+import express, { Request, Response } from "express";
+import { routes } from "./routes";
+import cors from "cors";
+import { envVars } from "./config/env";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import notFound from "./middlewares/notFound";
+
+const app = express();
+
+app.use(cors({ origin: envVars.FRONT_URL, credentials: true }));
+app.use(express.json());
+
+app.use("/api/v1", routes);
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello World!");
+});
+
+app.use(notFound);
+
+app.use(globalErrorHandler);
+
+export default app;
