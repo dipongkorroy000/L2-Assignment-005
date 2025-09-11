@@ -5,7 +5,7 @@ import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status-codes";
 
 const credentialLogin = catchAsync(async (req: Request, res: Response) => {
-  const loginInfo = await AuthService.credentialLogin(req.body);
+  const loginInfo = await AuthService.credentialLogin(req.body, res);
 
   sendResponse(res, { status: httpStatus.OK, success: true, message: "Login Successfully", data: loginInfo });
   // ---

@@ -5,8 +5,10 @@ import bcrypt from "bcryptjs";
 import { User } from "../user/user.model";
 import { createUserTokens } from "../../utils/generateToken";
 import { IUser } from "../user/user.interface";
+import { setAuthCookie } from "../../utils/setCookie";
+import { Response } from "express";
 
-const credentialLogin = async (payload: Partial<IUser>) => {
+const credentialLogin = async (payload: Partial<IUser>, res: Response) => {
   const { email, password } = payload;
 
   const isUserExist = await User.findOne({ email });
@@ -16,6 +18,8 @@ const credentialLogin = async (payload: Partial<IUser>) => {
   if (!isPasswordMatched) throw new CustomError(httpStatus.BAD_REQUEST, "Incorrect Password");
 
   const userTokens = createUserTokens(isUserExist);
+
+  setAuthCookie(res, userTokens);
 
   const { password: pass, ...rest } = isUserExist.toObject();
 

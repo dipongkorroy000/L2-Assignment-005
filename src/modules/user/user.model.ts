@@ -20,7 +20,6 @@ const userSchema = new Schema<IUser>(
     address: { type: String },
     isDeleted: { type: Boolean, default: false },
     isActive: { type: String, enum: Object.values(IsActive), default: IsActive.active },
-    isVerified: { type: Boolean, default: false },
     auths: [authProviderSchema],
   },
   { versionKey: false, timestamps: true }
