@@ -8,6 +8,7 @@ const paymentSchema = new Schema<IPayment>(
     status: { type: String, enum: Object.values(PAYMENT_STATUS), default: PAYMENT_STATUS.UNPAID },
     amount: { type: Number, required: true },
     invoiceUrl: { type: String },
+    createdAt: { type: Date },
   },
   {
     timestamps: true,

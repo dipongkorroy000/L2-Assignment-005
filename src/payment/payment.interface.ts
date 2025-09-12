@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Date, Types } from "mongoose";
 
 export enum PAYMENT_STATUS {
   PAID = "PAID",
@@ -14,4 +14,5 @@ export interface IPayment {
   amount: number;
   status: PAYMENT_STATUS;
   invoiceUrl?: string;
+  createdAt?: Date;
 }

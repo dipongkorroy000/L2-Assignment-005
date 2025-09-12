@@ -4,7 +4,11 @@ import { PAYMENT_STATUS } from "./payment.interface";
 import { Payment } from "./payment.model";
 import CustomError from "../errorHelper/CustomError";
 import { Parcel } from "../modules/parcel/parcel.model";
-import { Payment_Status } from "../modules/parcel/parcel.interface";
+import { IParcel, Payment_Status } from "../modules/parcel/parcel.interface";
+import { sendEmail } from "../utils/sendEmail";
+import { generatePdf, IInvoiceData } from "../utils/invoice";
+import { User } from "../modules/user/user.model";
+import { uploadBufferToCloudinary } from "../config/cloudinary.config";
 
 const successPayment = async (query: Record<string, string>) => {
   const session = await Parcel.startSession();
@@ -24,8 +28,33 @@ const successPayment = async (query: Record<string, string>) => {
       { payment: Payment_Status.COMPLETE },
       { new: true, runValidators: true, session }
     );
-
     if (!updatedParcel) throw new CustomError(401, "Parcel not found");
+
+    const senderInfo = await User.findById(updatedParcel?.senderId);
+    if (!senderInfo) throw new CustomError(400, "User not found");
+
+    const invoiceData: IInvoiceData = {
+      deliveryDate: updatedPayment.createdAt as unknown as Date,
+      totalAmount: updatedPayment.amount,
+      tourTitle: (updatedParcel as unknown as IParcel).title,
+      transactionId: updatedPayment.transactionId,
+      userName: senderInfo.name as string,
+    };
+    const pdfBuffer = await generatePdf(invoiceData);
+
+    const cloudinaryResult = await uploadBufferToCloudinary(pdfBuffer, "invoice");
+
+    if (!cloudinaryResult) throw new CustomError(401, "Error uploading pdf");
+
+    await Payment.findByIdAndUpdate(updatedPayment._id, { invoiceUrl: cloudinaryResult.secure_url }, { runValidators: true, session });
+
+    await sendEmail({
+      to: senderInfo.email,
+      subject: "Your Parcel Delivery Invoice",
+      templateName: "invoice",
+      templateData: invoiceData,
+      attachments: [{ filename: "invoice.pdf", content: pdfBuffer, contentType: "application/pdf" }],
+    });
 
     await session.commitTransaction();
     session.endSession();
