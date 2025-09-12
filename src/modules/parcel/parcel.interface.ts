@@ -1,12 +1,11 @@
 import { Types } from "mongoose";
 
-export enum Status {
+export enum Parcel_Status {
   requested = "REQUESTED",
-  picked = "APPROVED",
+  approved = "APPROVED",
+  dispatched = "DISPATCHED",
   in_transit = "IN-TRANSIT",
-  DISPATCHED = "DISPATCHED",
   delivered = "DELIVERED",
-  blocked = "BLOCKED",
 }
 
 export interface Receiver {
@@ -17,10 +16,11 @@ export interface Receiver {
 }
 
 export interface StatusLog {
-  status: Status;
+  status: Parcel_Status;
   updatedBy: string;
   location: string;
   note: string;
+  timestamp: Date;
 }
 
 export enum Payment_Status {
@@ -40,7 +40,13 @@ export interface IParcel {
   city: string;
   area: string;
   receiverId?: Types.ObjectId;
-  status: Status;
+  status: Parcel_Status;
   payment: Payment_Status;
   statusLog?: StatusLog[];
+}
+
+export interface TParcelStatusLog {
+  status: Parcel_Status;
+  location: string;
+  note: string;
 }

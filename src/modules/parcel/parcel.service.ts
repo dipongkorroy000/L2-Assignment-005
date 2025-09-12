@@ -1,7 +1,7 @@
 import CustomError from "../../errorHelper/CustomError";
 import { getTransactionId } from "../../utils/generateId";
 import { User } from "../user/user.model";
-import { IParcel } from "./parcel.interface";
+import { IParcel, StatusLog, TParcelStatusLog } from "./parcel.interface";
 import status from "http-status-codes";
 import { Parcel } from "./parcel.model";
 import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
@@ -55,4 +55,31 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
   // return parcel;
 };
 
-export const parcelService = { parcelRequest };
+const parcelStatusUpdate = async (adminName: string, parcelId: string, payload: TParcelStatusLog) => {
+  if (!payload.location || !payload.note || !payload.status) {
+    throw new CustomError(status.BAD_REQUEST, "More Data Needed");
+  }
+
+  const parcel = await Parcel.findById(parcelId);
+  if (!parcel) {
+    throw new CustomError(status.BAD_REQUEST, "Parcel Not Found");
+  }
+
+  const statusLog: StatusLog = {
+    updatedBy: adminName,
+    location: payload.location,
+    note: payload.note,
+    status: payload.status,
+    timestamp: new Date(),
+  };
+
+  const updatedParcel = await Parcel.findByIdAndUpdate(
+    parcelId,
+    { $set: { status: payload.status }, $push: { statusLog: statusLog } },
+    { new: true, runValidators: true }
+  );
+
+  return updatedParcel;
+};
+
+export const parcelService = { parcelRequest, parcelStatusUpdate };

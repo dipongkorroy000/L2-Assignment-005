@@ -9,4 +9,7 @@ const route = Router();
 
 route.post("/", validateRequest(createParcelSchema), authorize(Role.admin, Role.sender), parcelController.parcelRequest);
 
+// parcel status change by admin
+route.patch("/:parcelId", authorize(Role.admin), parcelController.parcelStatusUpdate)
+
 export const ParcelRoute = route;
