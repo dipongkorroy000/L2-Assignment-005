@@ -22,4 +22,10 @@ const createUser = async (payload: Partial<IUser>) => {
   // -------
 };
 
-export const UserService = { createUser };
+const getMe = async (userId: string) => {
+  const user = await User.findById(userId).select("-password").select("-isDeleted");
+
+  return user;
+};
+
+export const UserService = { createUser, getMe };
