@@ -4,18 +4,26 @@ import mongoose from "mongoose";
 import { envVars } from "./config/env";
 import app from "./app";
 import { Server } from "http";
+import { connectRedis } from "./config/redis.config";
 
 let server: Server;
 
-main().catch((err) => console.log(err));
-
 async function main() {
-  await mongoose.connect(envVars.MONGO_URI);
+  try {
+    await mongoose.connect(envVars.MONGO_URI);
 
-  server = app.listen(envVars.PORT, () => {
-    console.log(`Example app listening on port ${envVars.PORT}`);
-  });
+    server = app.listen(envVars.PORT, () => {
+      console.log(`Example app listening on port ${envVars.PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+(async () => {
+  await connectRedis();
+  await main();
+})();
 
 process.on("SIGTERM", () => {
   console.log("SIGTERM signal received... Server shutting down..");

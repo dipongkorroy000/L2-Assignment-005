@@ -6,6 +6,7 @@ export enum Parcel_Status {
   dispatched = "DISPATCHED",
   in_transit = "IN-TRANSIT",
   delivered = "DELIVERED",
+  cancel= "CANCEL"
 }
 
 export interface Receiver {

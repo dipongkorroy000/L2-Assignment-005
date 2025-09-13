@@ -9,8 +9,10 @@ const route = Router();
 
 route.post("/", validateRequest(createParcelSchema), authorize(Role.admin, Role.sender), parcelController.parcelRequest);
 
+route.get("/all-parcel", authorize(Role.admin), parcelController.allParcels)
 
-route.patch("/track/:trackingId", authorize(Role.sender), parcelController.cancelParcel);
+
+route.delete("/:trackingId", authorize(Role.admin), parcelController.deleteParcel);
 
 route.get("/myParcels/:userId", authorize(...Object.values(Role)), parcelController.myParcels);
 

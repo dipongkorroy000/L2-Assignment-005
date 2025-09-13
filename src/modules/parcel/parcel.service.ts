@@ -1,7 +1,7 @@
 import CustomError from "../../errorHelper/CustomError";
 import { getTransactionId } from "../../utils/generateId";
 import { User } from "../user/user.model";
-import { IParcel, Parcel_Status, StatusLog, TParcelStatusLog } from "./parcel.interface";
+import { IParcel, StatusLog, TParcelStatusLog } from "./parcel.interface";
 import status from "http-status-codes";
 import { Parcel } from "./parcel.model";
 import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
@@ -88,26 +88,14 @@ const myParcels = async (userId: string) => {
   return parcels;
 };
 
-const cancelParcel = async (trackingId: string, feedBack: string | undefined) => {
-  const parcel = await Parcel.findOne({ trackingId: trackingId });
-
-  if (!parcel) throw new CustomError(status.NOT_FOUND, "Parcel Not Found");
-
-  if (
-    parcel.status === Parcel_Status.delivered ||
-    parcel.status === Parcel_Status.dispatched ||
-    parcel.status === Parcel_Status.in_transit
-  ) {
-    throw new CustomError(status.BAD_REQUEST, `The Parcel has been ${parcel.status}`);
-  }
-
-  if (!feedBack) {
-    return await Parcel.findByIdAndUpdate(parcel.id, { status: "CANCEL" });
-    // ---
-  } else if (feedBack) {
-    return await Parcel.findByIdAndUpdate(parcel.id, { status: "CANCEL", feedBack: feedBack });
-    // ----
-  }
+const deleteParcel = async (trackingId: string) => {
+  const result = await Parcel.deleteOne({ trackingId });
+  return result;
 };
 
-export const parcelService = { parcelRequest, parcelStatusUpdate, myParcels, cancelParcel };
+const allParcels = async () => {
+  const parcels = await Parcel.find();
+  return parcels;
+};
+
+export const parcelService = { parcelRequest, parcelStatusUpdate, myParcels, deleteParcel, allParcels };
