@@ -29,8 +29,8 @@ export const generatePdf = async (invoiceData: IInvoiceData): Promise<Buffer<Arr
       doc.text(`Customer : ${invoiceData.userName}`);
       doc.moveDown();
 
-      doc.text(`Tour : ${invoiceData.tourTitle}`);
-      doc.text(`Total Amount : ${invoiceData.totalAmount.toFixed(2)}`);
+      doc.text(`Parcel : ${invoiceData.tourTitle}`);
+      doc.text(`Total Delivery Charge : ${invoiceData.totalAmount.toFixed(2)}`);
       doc.moveDown();
 
       doc.text("Thank you for booking with us!", { align: "center" });

@@ -1,5 +1,6 @@
 import { PAYMENT_STATUS } from "../../payment/payment.interface";
 import { Payment } from "../../payment/payment.model";
+import { Parcel } from "../parcel/parcel.model";
 import { IsActive } from "../user/user.interface";
 import { User } from "../user/user.model";
 
@@ -51,6 +52,43 @@ const getUserStats = async () => {
   // ----
 };
 
+const parcelStats = async () => {
+  const totalParcelPromise = Parcel.countDocuments();
+
+  const totalParcelByStatusPromise = Payment.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]);
+
+  const statusLogEachStatusCountPromise = await Parcel.aggregate([
+    {
+      $project: {
+        lastStatus: {
+          $arrayElemAt: ["$statusLog.status", -1], // Get last status from statusLog
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$lastStatus", // Group by last status
+        count: { $sum: 1 }, // Count how many parcels have that last status
+      },
+    },
+    {
+      $project: {
+        status: "$_id",
+        count: 1,
+        _id: 0,
+      },
+    },
+  ]);
+
+  const [totalParcel, totalParcelByStatus, statusLogEachStatusCount] = await Promise.all([
+    totalParcelPromise,
+    totalParcelByStatusPromise,
+    statusLogEachStatusCountPromise,
+  ]);
+
+  return { totalParcel, totalParcelByStatus, statusLogEachStatusCount };
+};
+
 const getPaymentStats = async () => {
   const totalPaymentPromise = Payment.countDocuments();
 
@@ -75,4 +113,4 @@ const getPaymentStats = async () => {
   // -----
 };
 
-export const StatsService = { getUserStats, getPaymentStats };
+export const StatsService = { getUserStats, getPaymentStats, parcelStats };

@@ -8,6 +8,7 @@ import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
 import { SSLService } from "../../sslCommerz/sslCommerz.service";
 import { Payment } from "../../payment/payment.model";
 import { PAYMENT_STATUS } from "../../payment/payment.interface";
+import { Types } from "mongoose";
 
 const parcelRequest = async (payload: Partial<IParcel>) => {
   const session = await Parcel.startSession();
@@ -92,7 +93,7 @@ const senderParcels = async (senderId: string) => {
 };
 
 const receiverParcels = async (receiverId: string) => {
-  const result = await Parcel.find({ receiverId });
+  const result = await Parcel.find({ receiverId: new Types.ObjectId(receiverId) });
   return result;
 };
 

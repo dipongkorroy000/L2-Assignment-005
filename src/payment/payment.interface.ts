@@ -3,7 +3,7 @@ import { Date, Types } from "mongoose";
 export enum PAYMENT_STATUS {
   PAID = "PAID",
   UNPAID = "UNPAID",
-  CANCELLED = "CANCELLED",
+  CANCEL = "CANCEL",
   FAILED = "FAILED",
   REFUNDED = "REFUNDED",
 }

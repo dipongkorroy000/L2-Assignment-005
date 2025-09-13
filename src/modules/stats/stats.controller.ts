@@ -14,6 +14,16 @@ const getPaymentStats = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getParcelStats = catchAsync(async (req: Request, res: Response) => {
+  const stats = await StatsService.parcelStats();
+  sendResponse(res, {
+    status: 200,
+    success: true,
+    message: "User stats fetched successfully",
+    data: stats,
+  });
+});
+
 const getUserStats = catchAsync(async (req: Request, res: Response) => {
   const stats = await StatsService.getUserStats();
   sendResponse(res, {
@@ -24,4 +34,4 @@ const getUserStats = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const StatsController = { getUserStats, getPaymentStats };
+export const StatsController = { getUserStats, getParcelStats, getPaymentStats };

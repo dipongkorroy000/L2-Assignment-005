@@ -65,6 +65,76 @@ const successPayment = async (query: Record<string, string>) => {
     throw error;
   }
 };
+
+const failPayment = async (query: Record<string, string>) => {
+  // Update Booking Status to FAIL
+  // Update Payment Status to FAIL
+  const session = await Parcel.startSession();
+  session.startTransaction();
+
+  try {
+    const updatedPayment = await Payment.findOneAndUpdate(
+      { transactionId: query.transactionId },
+      { status: PAYMENT_STATUS.FAILED },
+      { session }
+    );
+
+    await Parcel.findOneAndUpdate(
+      { trackingId: updatedPayment?.transactionId },
+      { payment: Payment_Status.FAILED },
+      { runValidators: true, session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { success: false, message: "Payment Failed" };
+
+    // ---
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+
+    throw error;
+  }
+};
+
+const cancelPayment = async (query: Record<string, string>) => {
+  // Update Booking Status to CANCEL
+  // Update Payment Status to CANCEL
+
+  const session = await Parcel.startSession();
+  session.startTransaction();
+
+  try {
+    const updatedPayment = await Payment.findOneAndUpdate(
+      { transactionId: query.transactionId },
+      { status: PAYMENT_STATUS.CANCEL },
+      { session }
+    );
+
+    await Parcel.findOneAndUpdate(
+      { trackingId: updatedPayment?.transactionId },
+      { payment: Payment_Status.CANCEL },
+      { runValidators: true, session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { success: false, message: "Payment Canceled" };
+
+    // ---
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+
+    throw error;
+  }
+};
+
 export const PaymentService = {
   successPayment,
+  failPayment,
+  cancelPayment,
 };

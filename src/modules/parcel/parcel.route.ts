@@ -16,6 +16,7 @@ route.patch("/confirm", parcelController.confirmParcel);
 
 route.get("/:receiverId", authorize(Role.receiver), parcelController.receiverParcels);
 
+// admin can get specific parcel
 route.delete("/:trackingId", authorize(Role.admin), parcelController.deleteParcel);
 
 route.get("/myParcels/:senderId", authorize(...Object.values(Role)), parcelController.senderParcels);

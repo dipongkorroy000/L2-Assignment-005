@@ -50,7 +50,7 @@ const senderParcels = catchAsync(async (req: Request, res: Response) => {
 });
 
 const receiverParcels = async (req: Request, res: Response) => {
-  const receiverId = req.body.receiverId;
+  const receiverId = req.params.receiverId;
   const result = await parcelService.receiverParcels(receiverId);
   sendResponse(res, { status: status.OK, success: true, message: "Incoming parcels retrieved successfully", data: result });
 };
