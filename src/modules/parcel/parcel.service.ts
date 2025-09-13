@@ -1,7 +1,7 @@
 import CustomError from "../../errorHelper/CustomError";
 import { getTransactionId } from "../../utils/generateId";
 import { User } from "../user/user.model";
-import { IParcel, StatusLog, TParcelStatusLog } from "./parcel.interface";
+import { IParcel, Parcel_Status, StatusLog, TParcelStatusLog } from "./parcel.interface";
 import status from "http-status-codes";
 import { Parcel } from "./parcel.model";
 import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
@@ -19,7 +19,8 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
     const senderInfo = await User.findById(senderId);
     if (!senderInfo) throw new CustomError(status.NOT_FOUND, "User not found");
 
-    if (!senderInfo.phone || !senderInfo.address) throw new CustomError(status.BAD_REQUEST, "Please Update Your Profile to Book a Tour.");
+    if (!senderInfo.phone || !senderInfo.address)
+      throw new CustomError(status.BAD_REQUEST, "Please Update Your Profile to Parcel Request And Must be add Phone & Address.");
 
     const trackingId = getTransactionId();
 
@@ -82,4 +83,31 @@ const parcelStatusUpdate = async (adminName: string, parcelId: string, payload: 
   return updatedParcel;
 };
 
-export const parcelService = { parcelRequest, parcelStatusUpdate };
+const myParcels = async (userId: string) => {
+  const parcels = await Parcel.find({ senderId: userId });
+  return parcels;
+};
+
+const cancelParcel = async (trackingId: string, feedBack: string | undefined) => {
+  const parcel = await Parcel.findOne({ trackingId: trackingId });
+
+  if (!parcel) throw new CustomError(status.NOT_FOUND, "Parcel Not Found");
+
+  if (
+    parcel.status === Parcel_Status.delivered ||
+    parcel.status === Parcel_Status.dispatched ||
+    parcel.status === Parcel_Status.in_transit
+  ) {
+    throw new CustomError(status.BAD_REQUEST, `The Parcel has been ${parcel.status}`);
+  }
+
+  if (!feedBack) {
+    return await Parcel.findByIdAndUpdate(parcel.id, { status: "CANCEL" });
+    // ---
+  } else if (feedBack) {
+    return await Parcel.findByIdAndUpdate(parcel.id, { status: "CANCEL", feedBack: feedBack });
+    // ----
+  }
+};
+
+export const parcelService = { parcelRequest, parcelStatusUpdate, myParcels, cancelParcel };

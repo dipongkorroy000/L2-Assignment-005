@@ -43,6 +43,7 @@ export interface IParcel {
   status: Parcel_Status;
   payment: Payment_Status;
   statusLog?: StatusLog[];
+  feedBack?: string;
 }
 
 export interface TParcelStatusLog {

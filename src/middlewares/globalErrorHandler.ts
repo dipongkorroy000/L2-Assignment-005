@@ -22,7 +22,7 @@ export const globalErrorHandler = async (err: any, req: Request, res: Response, 
     success: false,
     message: message,
     // errorSources,
-    err: envVars.NODE_ENV === "development" ? err : null,
-    stack: envVars.NODE_ENV === "development" ? err.stack : null,
+    // err: envVars.NODE_ENV === "development" ? err : null,
+    // stack: envVars.NODE_ENV === "development" ? err.stack : null,
   });
 };

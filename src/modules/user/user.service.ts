@@ -3,7 +3,7 @@ import { User } from "./user.model";
 import status from "http-status-codes";
 import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
-import { IAuthProvider, IUser } from "./user.interface";
+import { IAuthProvider, IUser, UpdateUser } from "./user.interface";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, ...rest } = payload;
@@ -28,4 +28,21 @@ const getMe = async (userId: string) => {
   return user;
 };
 
-export const UserService = { createUser, getMe };
+const updateProfile = async (email: string, payload: UpdateUser) => {
+  const user = await User.findOne({ email });
+
+  if (!user) throw new CustomError(status.NOT_FOUND, "User not found");
+
+  const updateUser = await User.findByIdAndUpdate(user._id, { $set: { phone: payload.phone, address: payload.address } });
+
+  return updateUser;
+};
+
+const getAllUsers = async () => {
+  const users = await User.find({}).select("-password");
+  const totalUsers = await User.countDocuments();
+
+  return { data: users, meta: { total: totalUsers } };
+};
+
+export const UserService = { createUser, getMe, updateProfile, getAllUsers };

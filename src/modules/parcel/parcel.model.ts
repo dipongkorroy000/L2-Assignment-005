@@ -9,7 +9,6 @@ const statusLogSchema = new Schema<StatusLog>({
   timestamp: { type: Date, default: Date.now },
 });
 
-
 const parcelSchema = new Schema<IParcel>(
   {
     senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -24,6 +23,7 @@ const parcelSchema = new Schema<IParcel>(
     status: { type: String, enum: Object.values(Parcel_Status), default: Parcel_Status.requested },
     payment: { type: String, enum: Object.values(Payment_Status), default: Payment_Status.PENDING },
     statusLog: { type: [statusLogSchema], default: [] },
+    feedBack: { type: String },
   },
   {
     timestamps: true,

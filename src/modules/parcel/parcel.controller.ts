@@ -33,4 +33,24 @@ const parcelStatusUpdate = catchAsync(async (req: Request, res: Response) => {
   // -----
 });
 
-export const parcelController = { parcelRequest, parcelStatusUpdate };
+const cancelParcel = catchAsync(async (req: Request, res: Response) => {
+  const trackingId = req.params.trackingId;
+
+  const feedBack = await req.body?.feedBack;
+
+  const result = await parcelService.cancelParcel(trackingId, feedBack);
+
+  sendResponse(res, { status: status.OK, success: true, message: "Parcel has Cancel", data: result });
+
+  // -----
+});
+
+const myParcels = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  const result = await parcelService.myParcels(userId);
+
+  sendResponse(res, { status: status.OK, success: true, message: "My Parcels retrieved successfully", data: result });
+});
+
+export const parcelController = { parcelRequest, parcelStatusUpdate, myParcels, cancelParcel };

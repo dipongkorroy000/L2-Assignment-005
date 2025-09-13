@@ -9,6 +9,14 @@ const router = Router();
 
 router.post("/register", validateRequest(createUserZodSchema), UserControllers.createUser);
 
+
+// update by query(email) user profile
+router.patch("/", authorize(Role.sender, Role.receiver), UserControllers.updateProfile);
+
+// admin routes
+router.get("/all-users",authorize(Role.admin), UserControllers.getAllUsers);
+
+// anyone use
 router.get("/:userId", authorize(...Object.values(Role)), UserControllers.getMe);
 
 export const UserRoute = router;
