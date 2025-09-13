@@ -43,12 +43,23 @@ const deleteParcel = catchAsync(async (req: Request, res: Response) => {
   // -----
 });
 
-const myParcels = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.userId;
-
-  const result = await parcelService.myParcels(userId);
-
+const senderParcels = catchAsync(async (req: Request, res: Response) => {
+  const senderId = req.params.senderId;
+  const result = await parcelService.senderParcels(senderId);
   sendResponse(res, { status: status.OK, success: true, message: "My Parcels retrieved successfully", data: result });
+});
+
+const receiverParcels = async (req: Request, res: Response) => {
+  const receiverId = req.body.receiverId;
+  const result = await parcelService.receiverParcels(receiverId);
+  sendResponse(res, { status: status.OK, success: true, message: "Incoming parcels retrieved successfully", data: result });
+};
+
+const confirmParcel = catchAsync(async (req: Request, res: Response) => {
+  const { trackingId, phone, email } = req.body;
+  const result = await parcelService.confirmParcel(trackingId, phone, email);
+
+  sendResponse(res, { status: status.OK, success: true, message: "Parcel confirm", data: result });
 });
 
 const allParcels = catchAsync(async (req: Request, res: Response) => {
@@ -57,4 +68,12 @@ const allParcels = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, { status: status.OK, success: true, message: "All Parcels retrieved successfuly", data: result });
 });
 
-export const parcelController = { parcelRequest, parcelStatusUpdate, myParcels, deleteParcel, allParcels };
+export const parcelController = {
+  parcelRequest,
+  parcelStatusUpdate,
+  senderParcels,
+  deleteParcel,
+  allParcels,
+  receiverParcels,
+  confirmParcel,
+};

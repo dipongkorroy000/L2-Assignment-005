@@ -1,7 +1,7 @@
 import CustomError from "../../errorHelper/CustomError";
 import { getTransactionId } from "../../utils/generateId";
 import { User } from "../user/user.model";
-import { IParcel, StatusLog, TParcelStatusLog } from "./parcel.interface";
+import { IParcel, Payment_Status, Status, StatusLog, TParcelStatusLog } from "./parcel.interface";
 import status from "http-status-codes";
 import { Parcel } from "./parcel.model";
 import { ISSLCommerz } from "../../sslCommerz/sslCommerz.interface";
@@ -14,13 +14,18 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
   session.startTransaction();
 
   try {
-    const { senderId, ...rest, weight = 1 } = payload;
+    const { senderId, ...rest, weight = 1, receiverId } = payload;
 
     const senderInfo = await User.findById(senderId);
     if (!senderInfo) throw new CustomError(status.NOT_FOUND, "User not found");
 
     if (!senderInfo.phone || !senderInfo.address)
       throw new CustomError(status.BAD_REQUEST, "Please Update Your Profile to Parcel Request And Must be add Phone & Address.");
+
+    if (receiverId) {
+      const receiver = await User.findById(receiverId);
+      if (!receiver) throw new CustomError(401, "Receiver not found");
+    }
 
     const trackingId = getTransactionId();
 
@@ -74,18 +79,54 @@ const parcelStatusUpdate = async (adminName: string, parcelId: string, payload: 
     timestamp: new Date(),
   };
 
-  const updatedParcel = await Parcel.findByIdAndUpdate(
-    parcelId,
-    { $set: { status: payload.status }, $push: { statusLog: statusLog } },
-    { new: true, runValidators: true }
-  );
+  parcel.statusLog?.push(statusLog);
+
+  const updatedParcel = await parcel.save();
 
   return updatedParcel;
 };
 
-const myParcels = async (userId: string) => {
-  const parcels = await Parcel.find({ senderId: userId });
+const senderParcels = async (senderId: string) => {
+  const parcels = await Parcel.find({ senderId });
   return parcels;
+};
+
+const receiverParcels = async (receiverId: string) => {
+  const result = await Parcel.find({ receiverId });
+  return result;
+};
+
+const confirmParcel = async (trackingId: string, phone: string | undefined, email: string | undefined) => {
+  const parcel = await Parcel.findOne({ trackingId });
+  if (!parcel) throw new CustomError(401, "Parcel not found");
+  if (parcel.payment !== Payment_Status.COMPLETE) throw new CustomError(status.BAD_REQUEST, "Payment must be completed");
+
+  if (email && parcel.receiverId) {
+    const receiver = await User.findOne({ email });
+    if (!receiver) throw new CustomError(401, "Receiver not found");
+
+    // console.log(typeof receiver._id); // 'object'
+    // console.log(typeof parcel.receiverId); // 'object' or 'string'
+    // solution ->  .toString()
+
+    if (!receiver) throw new CustomError(401, "User Not Found");
+    if (!receiver.phone) throw new CustomError(401, "Please update your profile , must be add phone number");
+
+    if (receiver._id.toString() !== parcel.receiverId.toString())
+      throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valied this receiver");
+
+    const result = await Parcel.updateOne({ trackingId }, { status: Status.picked });
+
+    return result;
+  } else if (phone && parcel.receiverNumber) {
+    if (phone !== parcel.receiverNumber) throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valied this receiver");
+
+    const result = await Parcel.updateOne({ trackingId }, { status: Status.picked });
+
+    return result;
+  }
+
+  throw new CustomError(status.NOT_ACCEPTABLE, "Please provide receiver email or phone");
 };
 
 const deleteParcel = async (trackingId: string) => {
@@ -98,4 +139,4 @@ const allParcels = async () => {
   return parcels;
 };
 
-export const parcelService = { parcelRequest, parcelStatusUpdate, myParcels, deleteParcel, allParcels };
+export const parcelService = { parcelRequest, parcelStatusUpdate, senderParcels, deleteParcel, allParcels, receiverParcels, confirmParcel };

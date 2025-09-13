@@ -1,12 +1,29 @@
 import { Types } from "mongoose";
 
-export enum Parcel_Status {
+export enum Status {
   requested = "REQUESTED",
+  picked = "PICKED",
+  cancel = "CANCEL",
+}
+
+export enum Parcel_Status {
   approved = "APPROVED",
   dispatched = "DISPATCHED",
   in_transit = "IN-TRANSIT",
   delivered = "DELIVERED",
-  cancel= "CANCEL"
+}
+
+export interface TParcelStatusLog {
+  status: Parcel_Status;
+  location: string;
+  note: string;
+}
+
+export enum Payment_Status {
+  PENDING = "PENDING",
+  CANCEL = "CANCEL",
+  COMPLETE = "COMPLETE",
+  FAILED = "FAILED",
 }
 
 export interface Receiver {
@@ -24,13 +41,6 @@ export interface StatusLog {
   timestamp: Date;
 }
 
-export enum Payment_Status {
-  PENDING = "PENDING",
-  CANCEL = "CANCEL",
-  COMPLETE = "COMPLETE",
-  FAILED = "FAILED",
-}
-
 export interface IParcel {
   senderId: Types.ObjectId;
   title: string;
@@ -41,14 +51,9 @@ export interface IParcel {
   city: string;
   area: string;
   receiverId?: Types.ObjectId;
-  status: Parcel_Status;
+  receiverNumber: string;
+  status: Status;
   payment: Payment_Status;
   statusLog?: StatusLog[];
   feedBack?: string;
-}
-
-export interface TParcelStatusLog {
-  status: Parcel_Status;
-  location: string;
-  note: string;
 }

@@ -4,7 +4,7 @@ import { sendEmail } from "../utils/sendEmail";
 import { User } from "../modules/user/user.model";
 import { redisClient } from "../config/redis.config";
 import { Parcel } from "../modules/parcel/parcel.model";
-import { Parcel_Status } from "../modules/parcel/parcel.interface";
+import { Status, TParcelStatusLog } from "../modules/parcel/parcel.interface";
 
 const OTP_EXPIRATION = 2 * 60; // 2minute
 
@@ -20,12 +20,9 @@ const sendOTP = async (trackingId: string) => {
   const parcel = await Parcel.findOne({ trackingId: trackingId });
   if (!parcel) throw new CustomError(401, "Parcel not found");
 
-  if (
-    parcel.status === Parcel_Status.delivered ||
-    parcel.status === Parcel_Status.dispatched ||
-    parcel.status === Parcel_Status.in_transit
-  ) {
-    throw new CustomError(400, `The Parcel has been ${parcel.status}`);
+  if ((parcel.statusLog as object[]).length > 1) {
+    const obj = (parcel.statusLog as object[])[(parcel.statusLog as object[]).length - 1] as Partial<TParcelStatusLog>
+    throw new CustomError(400, `The Parcel has been ${obj.status}`);
   }
 
   const user = await User.findById(parcel.senderId);
@@ -55,7 +52,7 @@ const verifyOTP = async (trackingId: string, otp: string) => {
   if (savedOtp !== otp) throw new CustomError(401, "Invalid OTP");
 
   await Promise.all([
-    await Parcel.updateOne({ trackingId }, { status: Parcel_Status.cancel }, { runValidators: true }),
+    await Parcel.updateOne({ trackingId }, { status: Status.cancel }, { runValidators: true }),
     await redisClient.del([redisKey]),
   ]);
 };

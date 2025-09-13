@@ -3,6 +3,7 @@ import { UserService } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
 import status from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
+import CustomError from "../../errorHelper/CustomError";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
@@ -13,9 +14,10 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.userId;
+  const email = req.query.email;
+  if (!email) throw new CustomError(401, "please provide email");
 
-  const user = await UserService.getMe(userId);
+  const user = await UserService.getMe(email as string);
 
   sendResponse(res, { status: status.OK, success: true, data: user, message: "User Retrieved successfully" });
 });
@@ -30,7 +32,7 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, { status: status.OK, success: true, message: "profile updated successfully", data: result });
 });
 
-const getAllUsers = catchAsync(async (req: Request, res: Response ) => {
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getAllUsers();
 
   sendResponse(res, {

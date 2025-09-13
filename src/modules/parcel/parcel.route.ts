@@ -9,12 +9,16 @@ const route = Router();
 
 route.post("/", validateRequest(createParcelSchema), authorize(Role.admin, Role.sender), parcelController.parcelRequest);
 
-route.get("/all-parcel", authorize(Role.admin), parcelController.allParcels)
+route.get("/all-parcel", authorize(Role.admin), parcelController.allParcels);
 
+// receiver picked parcel by email or phone
+route.patch("/confirm", parcelController.confirmParcel);
+
+route.get("/:receiverId", authorize(Role.receiver), parcelController.receiverParcels);
 
 route.delete("/:trackingId", authorize(Role.admin), parcelController.deleteParcel);
 
-route.get("/myParcels/:userId", authorize(...Object.values(Role)), parcelController.myParcels);
+route.get("/myParcels/:senderId", authorize(...Object.values(Role)), parcelController.senderParcels);
 
 // parcel status change by admin
 route.patch("/:parcelId", authorize(Role.admin), parcelController.parcelStatusUpdate);

@@ -22,9 +22,8 @@ const createUser = async (payload: Partial<IUser>) => {
   // -------
 };
 
-const getMe = async (userId: string) => {
-  const user = await User.findById(userId).select("-password").select("-isDeleted");
-
+const getMe = async (email: string) => {
+  const user = await User.findOne({email}).select("-password").select("-isDeleted");
   return user;
 };
 
