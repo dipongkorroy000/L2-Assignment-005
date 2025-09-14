@@ -19,7 +19,7 @@ const createUser = async (payload: Partial<IUser>) => {
 
   const authProvider: IAuthProvider = { provider: "credentials", providerId: email as string };
 
-  const user = await User.create({ email, password: hashedPass, role, auths: [authProvider], ...rest });
+  const user = await User.create({ email, password: hashedPass, role, auths: [authProvider], ...rest })
 
   return user;
 };

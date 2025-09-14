@@ -33,4 +33,4 @@ route.patch("/:parcelId", authorize(Role.admin), parcelController.parcelStatusUp
 
 // ---- parcel cancel by sender -> otp functionality 
 
-export const ParcelRoute = route;
+export const ParcelRoute = route; 

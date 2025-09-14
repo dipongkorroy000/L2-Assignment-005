@@ -41,7 +41,6 @@ export const generatePdf = async (invoiceData: IInvoiceData): Promise<Buffer<Arr
     // -------
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.log("invoice error", error);
     throw new CustomError(401, `Pdf creation error ${error.message}`);
   }
 };

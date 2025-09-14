@@ -11,7 +11,12 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
   const result = await UserService.createUser(payload);
 
-  sendResponse(res, { status: status.CREATED, success: true, data: result, message: "User created successfully" });
+  sendResponse(res, {
+    status: status.CREATED,
+    success: true,
+    data: { name: result.name, email: result.email, phone: result?.phone },
+    message: "User created successfully",
+  });
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
@@ -39,7 +44,12 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
 
   const result = await UserService.updateProfile(email as string, payload);
 
-  sendResponse(res, { status: status.OK, success: true, message: "profile updated successfully", data: result });
+  sendResponse(res, {
+    status: status.OK,
+    success: true,
+    message: "profile updated successfully",
+    data: { name: result?.name, email: result?.email, phone: result?.phone, address: result?.address },
+  });
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {

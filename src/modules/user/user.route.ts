@@ -19,4 +19,4 @@ router.patch("/", authorize(Role.sender, Role.receiver), UserControllers.updateP
 router.get("/all-users",authorize(Role.admin), UserControllers.getAllUsers);
 
 
-export const UserRoute = router;
+export const UserRoute = router; 

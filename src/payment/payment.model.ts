@@ -7,6 +7,7 @@ const paymentSchema = new Schema<IPayment>(
     transactionId: { type: String, required: true, unique: true },
     status: { type: String, enum: Object.values(PAYMENT_STATUS), default: PAYMENT_STATUS.UNPAID },
     amount: { type: Number, required: true },
+    paymentGatewayData: { type: Object },
     invoiceUrl: { type: String },
     createdAt: { type: Date },
   },

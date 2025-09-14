@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import CustomError from "../../errorHelper/CustomError";
 import { getTransactionId } from "../../utils/generateId";
 import { User } from "../user/user.model";
@@ -37,7 +39,7 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
     await Payment.create([{ parcel: parcel[0]._id, transactionId: trackingId, amount: amount, status: PAYMENT_STATUS.UNPAID }], {
       session,
     });
-
+    
     const sslPayload: ISSLCommerz = {
       name: senderInfo.name,
       phoneNumber: senderInfo.phone as string,
