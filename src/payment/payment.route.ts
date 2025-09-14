@@ -9,4 +9,6 @@ router.post("/cancel", PaymentController.cancelPayment);
 
 router.post("/init-payment/:trackingId", PaymentController.nextTimePayment);
 
+router.post("/validate-payment", PaymentController.validatePayment);
+
 export const PaymentRoutes = router;
