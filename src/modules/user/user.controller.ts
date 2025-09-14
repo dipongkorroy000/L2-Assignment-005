@@ -79,6 +79,9 @@ const updateUserRole = catchAsync(async (req: Request, res: Response) => {
 
   if (token.userId.toString() !== user._id.toString()) throw new CustomError(status.NOT_FOUND, "Not authorized");
 
+  if (token.role === Role.admin && role === Role.super_admin) throw new CustomError(status.NOT_FOUND, "Not authorized");
+  if (user.role === Role.admin && role === Role.super_admin) throw new CustomError(status.NOT_FOUND, "Not authorized");
+
   if ((user.role === Role.admin || user.role === Role.super_admin) && (token.role === Role.admin || token.role === Role.super_admin)) {
     const result = await UserService.updateUserRole(email, role);
     sendResponse(res, { success: true, status: status.OK, message: "Update successfully", data: result });
