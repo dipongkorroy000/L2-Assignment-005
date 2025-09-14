@@ -51,13 +51,15 @@ A secure and scalable parcel delivery backend built with **Express**, **TypeScri
 | Method | Endpoint | Description | Access |
 |--------|----------|-------------|--------|
 | `POST` | `/` | Create a parcel delivery request | `admin`, `sender` |
-| `GET` | `/all-parcel` | Get all parcels in the system | `admin` |
-| `PATCH` | `/confirm` | Confirm a parcel by receiver (via email or phone) | `receiver` |
-| `GET` | `/receiver` | Get all incoming parcels for a receiver | `receiver` |
-| `GET` | `/myParcels/:senderId` | Get all parcels requested by a sender | `admin`, `sender` |
-| `GET` | `/anyOne/:trackingId` | Get parcel details and status log by tracking ID | `public` |
-| `DELETE` | `/:trackingId` | Delete a parcel by tracking ID | `admin` |
-| `PATCH` | `/:parcelId` | Update parcel status log (approved, dispatched, in-transit, delivered) | `admin` |
+| `GET`  | `/all-parcel` | Get all parcels in the system | `admin` |
+| `PATCH`| `/confirm` | Confirm a parcel by receiver (via email or phone) | `receiver` |
+| `GET`  | `/receiver` | Get all incoming parcels for a receiver | `receiver` |
+| `GET`  | `/myParcels/:senderId` | Get all parcels requested by a sender | `admin`, `sender` |
+| `GET`  | `/anyOne/:trackingId` | Get parcel details and status log by tracking ID | `public` |
+| `DELETE`| `/:trackingId` | Delete a parcel by tracking ID | `admin` |
+| `PATCH`| `/:parcelId` | Update parcel status log (approved, dispatched, in-transit, delivered) | `admin` |
+| `POST` | `/send` | Send OTP to sender’s email for parcel cancellation | `sender` |
+| `POST` | `/verify` | Verify OTP and cancel parcel if valid | `sender` |
 
 ---
 
