@@ -7,4 +7,6 @@ router.post("/success", PaymentController.successPayment);
 router.post("/fail", PaymentController.failPayment);
 router.post("/cancel", PaymentController.cancelPayment);
 
+router.post("/init-payment/:trackingId", PaymentController.nextTimePayment);
+
 export const PaymentRoutes = router;

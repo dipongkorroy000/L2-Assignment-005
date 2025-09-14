@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { PaymentService } from "./payment.service";
 import { envVars } from "../config/env";
 import { catchAsync } from "../utils/catchAsync";
+import { sendResponse } from "../utils/sendResponse";
 
 const successPayment = catchAsync(async (req: Request, res: Response) => {
   const query = req.query;
@@ -38,6 +39,13 @@ const cancelPayment = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+const nextTimePayment = catchAsync(async (req: Request, res: Response) => {
+  const trackingId = req.params.trackingId;
+  const result = await PaymentService.nextTimePayment(trackingId);
+  sendResponse(res, { status: 201, success: true, message: "Payment done successfully", data: result });
+});
+
+
 export const PaymentController = {
-  successPayment, failPayment, cancelPayment
+  successPayment, failPayment, cancelPayment, nextTimePayment
 };

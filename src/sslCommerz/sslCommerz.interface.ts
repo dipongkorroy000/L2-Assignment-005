@@ -5,5 +5,4 @@ export interface ISSLCommerz {
   email: string;
   phoneNumber: string;
   address?: string;
-  GatewayPageURL?: any;
 }

@@ -9,6 +9,8 @@ import { sendEmail } from "../utils/sendEmail";
 import { generatePdf, IInvoiceData } from "../utils/invoice";
 import { User } from "../modules/user/user.model";
 import { uploadBufferToCloudinary } from "../config/cloudinary.config";
+import { SSLService } from "../sslCommerz/sslCommerz.service";
+import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
 
 const successPayment = async (query: Record<string, string>) => {
   const session = await Parcel.startSession();
@@ -133,8 +135,36 @@ const cancelPayment = async (query: Record<string, string>) => {
   }
 };
 
+const nextTimePayment = async (trackingId: string) => {
+  const parcel = await Parcel.findOne({ trackingId });
+  if (!parcel) throw new CustomError(httpStatus.NOT_FOUND, "Parcel Not Found. You have not parcel any payment");
+
+  const sender = await User.findById(parcel.senderId);
+  if (!sender) throw new CustomError(401, "User not found");
+
+  const payment = await Payment.findOne({ transactionId: trackingId });
+  if (!payment) throw new CustomError(401, "Payment not found");
+
+  if (payment.status === PAYMENT_STATUS.PAID && parcel.payment === Payment_Status.COMPLETE)
+    throw new CustomError(httpStatus.BAD_REQUEST, "Delivery Charge already paid");
+
+  const sslPayload: ISSLCommerz = {
+    address: sender.address,
+    email: sender.email,
+    phoneNumber: sender.phone as string,
+    name: sender.name,
+    amount: payment.amount,
+    transactionId: payment.transactionId,
+  };
+
+  const sslPayment = await SSLService.sslPaymentInit(sslPayload);
+
+  return { paymentUrl: sslPayment.GatewayPageURL };
+};
+
 export const PaymentService = {
   successPayment,
   failPayment,
   cancelPayment,
+  nextTimePayment,
 };
