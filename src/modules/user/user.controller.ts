@@ -5,6 +5,7 @@ import status from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
 import CustomError from "../../errorHelper/CustomError";
 import { User } from "./user.model";
+import { Role } from "./user.interface";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
@@ -69,9 +70,28 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateUserRole = catchAsync(async (req: Request, res: Response) => {
+  const token = req.token;
+  const { email, role } = await req.body;
+
+  const user = await User.findOne({ email: token.email });
+  if (!user) throw new CustomError(status.NOT_FOUND, "Not authorized");
+
+  if (token.userId.toString() !== user._id.toString()) throw new CustomError(status.NOT_FOUND, "Not authorized");
+
+  if (token.role === Role.admin && role === Role.super_admin) throw new CustomError(status.NOT_FOUND, "Not authorized");
+  if (user.role === Role.admin && role === Role.super_admin) throw new CustomError(status.NOT_FOUND, "Not authorized");
+
+  if ((user.role === Role.admin || user.role === Role.super_admin) && (token.role === Role.admin || token.role === Role.super_admin)) {
+    const result = await UserService.updateUserRole(email, role);
+    sendResponse(res, { success: true, status: status.OK, message: "Update successfully", data: result });
+  }
+});
+
 export const UserControllers = {
   createUser,
   getMe,
   updateProfile,
   getAllUsers,
+  updateUserRole,
 };

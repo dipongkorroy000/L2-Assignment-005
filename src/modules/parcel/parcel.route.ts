@@ -11,7 +11,7 @@ const route = Router();
 route.post("/", validateRequest(createParcelSchema), authorize(Role.admin, Role.sender), parcelController.parcelRequest);
 
 // all parcels get by admin
-route.get("/all-parcel", authorize(Role.admin), parcelController.allParcels);
+route.get("/all-parcel", authorize(Role.admin, Role.super_admin), parcelController.allParcels);
 
 // receiver picked(confirm parcel) parcel by email or phoneNumber
 route.patch("/confirm", parcelController.confirmParcel);
@@ -26,10 +26,10 @@ route.get("/myParcels/:senderId", authorize(Role.admin, Role.sender), parcelCont
 route.get("/anyOne/:trackingId", parcelController.singleParcel);
 
 // single parcel delete by admin
-route.delete("/:trackingId", authorize(Role.admin), parcelController.deleteParcel);
+route.delete("/:trackingId", authorize(Role.admin, Role.super_admin), parcelController.deleteParcel);
 
 // parcel statusLog(approved, dispatched, in-transit, delivered) update by admin
-route.patch("/:parcelId", authorize(Role.admin), parcelController.parcelStatusUpdate);
+route.patch("/:parcelId", authorize(Role.admin, Role.super_admin), parcelController.parcelStatusUpdate);
 
 // ---- parcel cancel by sender -> otp functionality 
 

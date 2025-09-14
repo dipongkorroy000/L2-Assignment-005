@@ -4,6 +4,9 @@ import { envVars } from "../config/env";
 import { catchAsync } from "../utils/catchAsync";
 import { sendResponse } from "../utils/sendResponse";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
+import { User } from "../modules/user/user.model";
+import CustomError from "../errorHelper/CustomError";
+import { Role } from "../modules/user/user.interface";
 
 const successPayment = catchAsync(async (req: Request, res: Response) => {
   const query = req.query;
@@ -47,7 +50,6 @@ const nextTimePayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const validatePayment = catchAsync(async (req: Request, res: Response) => {
-
   await SSLService.validatePayment(req.body);
 
   sendResponse(res, {
@@ -58,10 +60,26 @@ const validatePayment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getPayments = catchAsync(async (req: Request, res: Response) => {
+  const token = await req.token;
+  const user = await User.findById(token.userId);
+
+  if (!user) throw new CustomError(401, "User not found");
+
+  if (user.role === Role.admin || user.role === Role.super_admin) {
+    const payments = await PaymentService.getPayments();
+    sendResponse(res, { success: true, status: 200, message: "all payments", data: payments });
+    return;
+  } else {
+    sendResponse(res, { success: true, status: 400, message: "not authorized", data: null });
+  }
+});
+
 export const PaymentController = {
   successPayment,
   failPayment,
   cancelPayment,
   nextTimePayment,
   validatePayment,
+  getPayments,
 };

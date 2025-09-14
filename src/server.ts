@@ -5,6 +5,7 @@ import { envVars } from "./config/env";
 import app from "./app";
 import { Server } from "http";
 import { connectRedis } from "./config/redis.config";
+import { superAdmin } from "./utils/superAdmin";
 
 let server: Server;
 
@@ -23,6 +24,7 @@ async function main() {
 (async () => {
   await connectRedis();
   await main();
+  await superAdmin();
 })();
 
 process.on("SIGTERM", () => {

@@ -4,6 +4,7 @@ export enum Role {
   admin = "ADMIN",
   sender = "SENDER",
   receiver = "RECEIVER",
+  super_admin = "SUPER_ADMIN",
 }
 
 export interface IAuthProvider {

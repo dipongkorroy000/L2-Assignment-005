@@ -13,6 +13,9 @@ interface EnvConfig {
   JWT_REFRESH_EXPIRES: string;
   EXPRESS_SESSION_SECRET: string;
 
+  SUPER_ADMIN_EMAIL: string;
+  SUPER_ADMIN_PASSWORD: string;
+
   SSL: {
     STORE_ID: string;
     STORE_PASS: string;
@@ -62,6 +65,9 @@ const loadEnvVariables = (): EnvConfig => {
     "JWT_REFRESH_EXPIRES",
     "EXPRESS_SESSION_SECRET",
 
+    "SUPER_ADMIN_EMAIL",
+    "SUPER_ADMIN_PASSWORD",
+
     "SSL_STORE_ID",
     "SSL_STORE_PASS",
     "SSL_PAYMENT_API",
@@ -109,6 +115,10 @@ const loadEnvVariables = (): EnvConfig => {
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
     JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES as string,
     EXPRESS_SESSION_SECRET: process.env.EXPRESS_SESSION_SECRET as string,
+
+    SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
+    SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
+
     SSL: {
       STORE_ID: process.env.SSL_STORE_ID as string,
       STORE_PASS: process.env.SSL_STORE_PASS as string,
