@@ -19,6 +19,8 @@ router.patch("/", authorize(Role.sender, Role.receiver), UserControllers.updateP
 router.get("/all-users", authorize(Role.admin, Role.super_admin), UserControllers.getAllUsers);
 
 // update user role by {email, role} = req.body;
+// super admin can make super admin & admin & sender & receiver
+// and admin can make admin & sender & receiver
 router.patch("/updateUserRole", authorize(Role.admin, Role.super_admin), UserControllers.updateUserRole);
 
 export const UserRoute = router;
