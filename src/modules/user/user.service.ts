@@ -19,7 +19,7 @@ const createUser = async (payload: Partial<IUser>) => {
 
   const authProvider: IAuthProvider = { provider: "credentials", providerId: email as string };
 
-  const user = await User.create({ email, password: hashedPass, role, auths: [authProvider], ...rest })
+  const user = await User.create({ email, password: hashedPass, role, auths: [authProvider], ...rest });
 
   return user;
 };
@@ -47,4 +47,13 @@ const getAllUsers = async (userId: string) => {
   return { data: users, meta: { total: totalUsers } };
 };
 
-export const UserService = { createUser, getMe, updateProfile, getAllUsers };
+const updateUserRole = async (email: string, role: Role) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new CustomError(401, "User not found");
+
+  const updateRole = await User.findByIdAndUpdate(user._id, { role });
+
+  return updateRole;
+};
+
+export const UserService = { createUser, getMe, updateProfile, getAllUsers, updateUserRole };

@@ -5,8 +5,8 @@ import { authorize } from "../../middlewares/authorize";
 
 const router = express.Router();
 
-router.get("/user", authorize(Role.admin), StatsController.getUserStats);
-router.get("/parcel", authorize(Role.admin), StatsController.getParcelStats);
-router.get("/payment", authorize(Role.admin), StatsController.getPaymentStats);
+router.get("/user", authorize(Role.admin, Role.super_admin), StatsController.getUserStats);
+router.get("/parcel", authorize(Role.admin, Role.super_admin), StatsController.getParcelStats);
+router.get("/payment", authorize(Role.admin, Role.super_admin), StatsController.getPaymentStats);
 
-export const StatsRoute = router; 
+export const StatsRoute = router;

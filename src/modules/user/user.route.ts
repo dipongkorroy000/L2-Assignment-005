@@ -16,7 +16,9 @@ router.get("/", authorize(...Object.values(Role)), UserControllers.getMe);
 router.patch("/", authorize(Role.sender, Role.receiver), UserControllers.updateProfile);
 
 // admin routes
-router.get("/all-users",authorize(Role.admin), UserControllers.getAllUsers);
+router.get("/all-users", authorize(Role.admin, Role.super_admin), UserControllers.getAllUsers);
 
+// update user role by {email, role} = req.body;
+router.patch("/updateUserRole", authorize(Role.admin, Role.super_admin), UserControllers.updateUserRole);
 
-export const UserRoute = router; 
+export const UserRoute = router;

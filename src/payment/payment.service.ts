@@ -162,9 +162,15 @@ const nextTimePayment = async (trackingId: string) => {
   return { paymentUrl: sslPayment.GatewayPageURL };
 };
 
+const getPayments = async () => {
+  const payments = await Payment.find();
+  return payments;
+};
+
 export const PaymentService = {
   successPayment,
   failPayment,
   cancelPayment,
   nextTimePayment,
+  getPayments,
 };
