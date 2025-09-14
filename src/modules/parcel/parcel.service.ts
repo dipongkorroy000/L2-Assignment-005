@@ -39,7 +39,7 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
     await Payment.create([{ parcel: parcel[0]._id, transactionId: trackingId, amount: amount, status: PAYMENT_STATUS.UNPAID }], {
       session,
     });
-
+    
     const sslPayload: ISSLCommerz = {
       name: senderInfo.name,
       phoneNumber: senderInfo.phone as string,
