@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import CustomError from "../../errorHelper/CustomError";
 import { getTransactionId } from "../../utils/generateId";
 import { User } from "../user/user.model";
