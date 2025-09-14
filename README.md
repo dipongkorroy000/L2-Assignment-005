@@ -14,6 +14,8 @@ A secure and scalable parcel delivery backend built with **Express**, **TypeScri
 - **cookie-parser** – Cookie handling
 - **CORS** – Cross-origin resource sharing
 - **bcrypt** – Password hashing
+- **nodemailer** – email sending
+- **redis** – otp send & verify
 
 ---
 
