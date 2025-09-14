@@ -68,10 +68,10 @@ A secure and scalable parcel delivery backend built with **Express**, **TypeScri
 git clone https://github.com/your-username/delivery-system-backend.git
 
 # Install dependencies
-npm install
+pnpm install
 
 # Setup environment variables
 cp .env.example .env
 
 # Run the server
-npm run dev**
+pnpm dev**
