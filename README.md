@@ -46,6 +46,16 @@ A secure and scalable parcel delivery backend built with **Express**, **TypeScri
 
 ---
 
+## 🧑‍💼 Admin Access & Controls
+
+Admins have full access to system data and can:
+
+- View all users and their status
+- View all parcels and their status
+- View and update payment status
+- Update parcel status logs (approved, dispatched, in-transit, delivered)
+- Delete parcels
+
 ## 📡 API Reference
 
 | Method | Endpoint | Description | Access |
