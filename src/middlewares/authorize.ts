@@ -28,6 +28,8 @@ export const authorize =
 
       if (!authRoles.includes(verifiedToken.role))
         throw new CustomError(httpStatus.METHOD_NOT_ALLOWED, "Your are not permitted to parcel send request");
+
+      req.token = verifiedToken;
       next();
     } catch (err) {
       next(err);

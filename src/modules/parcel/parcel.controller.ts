@@ -3,9 +3,6 @@ import { catchAsync } from "../../utils/catchAsync";
 import { parcelService } from "./parcel.service";
 import { sendResponse } from "../../utils/sendResponse";
 import statusCode from "http-status-codes";
-import { verifyJWTToken } from "../../utils/jwt";
-import { envVars } from "../../config/env";
-import { JwtPayload } from "jsonwebtoken";
 import { User } from "../user/user.model";
 import CustomError from "../../errorHelper/CustomError";
 import status from "http-status-codes";
@@ -19,13 +16,12 @@ const parcelRequest = catchAsync(async (req: Request, res: Response) => {
 });
 
 const parcelStatusUpdate = catchAsync(async (req: Request, res: Response) => {
-  const accessToken = req.headers.authorization;
+  const token = req.token;
   const parcelId = req.params.parcelId;
   const payload = await req.body;
-  if (!accessToken) throw new CustomError(status.BAD_REQUEST, "No Token Received");
-  const verifiedToken = verifyJWTToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload;
-  const admin = await User.findOne({ email: verifiedToken.email });
+  const admin = await User.findOne({ email: token.email });
   if (!admin) throw new CustomError(status.BAD_REQUEST, "User Not Found");
+  if (token.role !== admin.role) throw new CustomError(status.UNAUTHORIZED, "Unauthorized user");
 
   const result = await parcelService.parcelStatusUpdate(admin.name, parcelId, payload);
 
@@ -35,12 +31,8 @@ const parcelStatusUpdate = catchAsync(async (req: Request, res: Response) => {
 
 const deleteParcel = catchAsync(async (req: Request, res: Response) => {
   const trackingId = req.params.trackingId;
-
   const result = await parcelService.deleteParcel(trackingId);
-
   sendResponse(res, { status: status.OK, success: true, message: "Delete the parcel", data: result });
-
-  // -----
 });
 
 const senderParcels = catchAsync(async (req: Request, res: Response) => {
@@ -49,22 +41,36 @@ const senderParcels = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, { status: status.OK, success: true, message: "My Parcels retrieved successfully", data: result });
 });
 
-const receiverParcels = async (req: Request, res: Response) => {
-  const receiverId = req.params.receiverId;
-  const result = await parcelService.receiverParcels(receiverId);
+const receiverIncomingParcel = catchAsync(async (req: Request, res: Response) => {
+  const token = req.token;
+  const user = await User.findOne({ email: token.email });
+  if (!user) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
+  if (token.userId.toString() !== user._id.toString()) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
+
+  const result = await parcelService.receiverIncomingParcel(user._id);
+
+  sendResponse(res, { status: status.OK, success: true, data: result, message: "incoming parcel retrieved successfully" });
+});
+
+const singleParcel = async (req: Request, res: Response) => {
+  const trackingId = req.params.trackingId;
+  const result = await parcelService.singleParcel(trackingId);
   sendResponse(res, { status: status.OK, success: true, message: "Incoming parcels retrieved successfully", data: result });
 };
 
 const confirmParcel = catchAsync(async (req: Request, res: Response) => {
   const { trackingId, phone, email } = req.body;
   const result = await parcelService.confirmParcel(trackingId, phone, email);
-
   sendResponse(res, { status: status.OK, success: true, message: "Parcel confirm", data: result });
 });
 
 const allParcels = catchAsync(async (req: Request, res: Response) => {
-  const result = await parcelService.allParcels();
+  const token = req.token;
+  const admin = await User.findOne({ email: token.email });
+  if (!admin) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
+  if (token.userId.toString() !== admin._id.toString()) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
 
+  const result = await parcelService.allParcels();
   sendResponse(res, { status: status.OK, success: true, message: "All Parcels retrieved successfuly", data: result });
 });
 
@@ -74,6 +80,7 @@ export const parcelController = {
   senderParcels,
   deleteParcel,
   allParcels,
-  receiverParcels,
+  receiverIncomingParcel,
+  singleParcel,
   confirmParcel,
 };

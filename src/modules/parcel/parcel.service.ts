@@ -15,7 +15,7 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
   session.startTransaction();
 
   try {
-    const { senderId, ...rest, weight = 1, receiverId } = payload;
+    const { senderId, weight = 1, receiverId, ...rest } = payload;
 
     const senderInfo = await User.findById(senderId);
     if (!senderInfo) throw new CustomError(status.NOT_FOUND, "User not found");
@@ -92,8 +92,13 @@ const senderParcels = async (senderId: string) => {
   return parcels;
 };
 
-const receiverParcels = async (receiverId: string) => {
-  const result = await Parcel.find({ receiverId: new Types.ObjectId(receiverId) });
+const receiverIncomingParcel = async (receiverId: Types.ObjectId) => {
+  const parcels = await Parcel.find({ receiverId }).select("-_id -senderId -receiverId")
+  return parcels;
+};
+
+const singleParcel = async (trackingId: string) => {
+  const result = await Parcel.findOne({ trackingId }).select("statusLog -_id title")
   return result;
 };
 
@@ -140,4 +145,13 @@ const allParcels = async () => {
   return parcels;
 };
 
-export const parcelService = { parcelRequest, parcelStatusUpdate, senderParcels, deleteParcel, allParcels, receiverParcels, confirmParcel };
+export const parcelService = {
+  parcelRequest,
+  parcelStatusUpdate,
+  senderParcels,
+  deleteParcel,
+  allParcels,
+  singleParcel,
+  confirmParcel,
+  receiverIncomingParcel,
+};
